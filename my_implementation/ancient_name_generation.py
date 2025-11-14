@@ -12,7 +12,8 @@ w2i = {s:i for i, s in enumerate(words)}
 # i2w = {i:s for i, s in enumerate(words)}
 i2w = {i:s for s,i in w2i.items()}
 
-# build the dataset (a 3 gram dataset)
+# build the dataset (a 3 gram dataset) 
+# No. gram can be tuned, it's a hyperparameter on the model side, more gram -> more char considered for each inference == increase context window
 gram = 6
 X = []; Y = []
 for s in lst:

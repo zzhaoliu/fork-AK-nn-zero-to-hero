@@ -1,3 +1,5 @@
+#implementation of makemore part2 Multi-layer perceptron on a new dataset
+
 import torch
 import torch.nn.functional as F
 import matplotlib.pyplot as plt

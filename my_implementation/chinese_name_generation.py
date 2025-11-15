@@ -34,7 +34,7 @@ X_test = X[int(0.9*len(X)):]; Y_test = Y[int(0.9*len(Y)):]; print(f'test set siz
 
 # build the embedding layer
 g = torch.Generator().manual_seed(123456) # for reproducibility
-word_vec_dim = 2
+word_vec_dim = 10
 W = torch.randn((len(words), word_vec_dim), generator=g)
 
 # build the first hidden layer (weight dim = (gram * word_vec_dim, num neurons in this layer))
@@ -54,7 +54,7 @@ for p in parameters:
 print(f'Number of parameters in total: {sum(p.nelement() for p in parameters)}')
 
 # training loop
-train_iterations = 500
+train_iterations = 10000
 lossi = []
 iteri = []
 batch_size = 32

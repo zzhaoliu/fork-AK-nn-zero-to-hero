@@ -5,7 +5,8 @@ import torch.nn.functional as F
 import matplotlib.pyplot as plt
 
 # build the chinese character vocabulary dictionary
-lst = open('./Ancient_Names_Corpus（25W）.txt', 'r').read().splitlines()[3:] # The dataset is from https://github.com/wainshine/Chinese-Names-Corpus/blob/master/Chinese_Names_Corpus/Ancient_Names_Corpus%EF%BC%8825W%EF%BC%89.txt
+# lst = open('./Ancient_Names_Corpus（25W）.txt', 'r').read().splitlines()[4:] # The dataset is from https://github.com/wainshine/Chinese-Names-Corpus/blob/master/Chinese_Names_Corpus/Ancient_Names_Corpus%EF%BC%8825W%EF%BC%89.txt
+lst = open('./Chinese_Names_Corpus（120W）.txt', 'r').read().splitlines()[4:] # The dataset is from https://github.com/wainshine/Chinese-Names-Corpus/blob/master/Chinese_Names_Corpus/Chinese_Names_Corpus%EF%BC%88120W%EF%BC%89.txt
 words = sorted(list(set(''.join(lst))))
 words = ['.'] + words
 w2i = {s:i for i, s in enumerate(words)}

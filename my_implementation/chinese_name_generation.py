@@ -1,5 +1,4 @@
-#implementation of makemore part2 Multi-layer perceptron on a new dataset
-
+import numpy as np
 import torch
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
@@ -13,8 +12,7 @@ w2i = {s:i for i, s in enumerate(words)}
 # i2w = {i:s for i, s in enumerate(words)}
 i2w = {i:s for s,i in w2i.items()}
 
-# build the dataset (a 3 gram dataset) 
-# No. gram can be tuned, it's a hyperparameter on the model side, more gram -> more char considered for each inference == increase context window
+# build the dataset (a 3 gram dataset)
 gram = 6
 X = []; Y = []
 for s in lst:
@@ -38,7 +36,7 @@ word_vec_dim = 10
 W = torch.randn((len(words), word_vec_dim), generator=g)
 
 # build the first hidden layer (weight dim = (gram * word_vec_dim, num neurons in this layer))
-layer_1_dim = 100
+layer_1_dim = 300
 W1 = torch.randn((gram * word_vec_dim, layer_1_dim), generator=g)
 b1 = torch.randn(layer_1_dim, generator=g)
 
@@ -54,11 +52,16 @@ for p in parameters:
 print(f'Number of parameters in total: {sum(p.nelement() for p in parameters)}')
 
 # training loop
-train_iterations = 10000
+train_iterations = 100000
 lossi = []
 iteri = []
 batch_size = 32
 lr = 0.1
+
+# for learning rate decay
+lre = np.linspace(0, -3, train_iterations)
+lrs = 10**lre
+
 for _ in range(train_iterations):
     # minibatch construct
     ix = torch.randint(0, X_train.shape[0], (batch_size,), generator=g)
@@ -75,17 +78,28 @@ for _ in range(train_iterations):
     loss.backward() # compute gradients
     
     # update parameters
+    lr = lrs[_] # implement the learning rate decay, comment off this if you want to use a fixed learning rate
     for p in parameters:
         p.data += -lr * p.grad
-    
+        
     # track stats
     iteri.append(_)
-    lossi.append(loss.log10().item()) # log10 makes the visualisation of loss change more linear, more intuitive to inspect
+    lossi.append(loss.item()) # log10 makes the visualisation of loss change more linear, more intuitive to inspect
+
+    # show the progress every 10% of the training iterations
+    if _ == 0 or (_+1) % (train_iterations/10) == 0:
+        print(f'iteration {_+1}: loss {loss.item()}')
 
 # visualise the loss against iteration curve on train set
-plt.plot(iteri, lossi)
+loss_log10 = np.log10(np.array(lossi))
+plt.plot(iteri, loss_log10)
 plt.xlabel('iteration')
 plt.ylabel('log10(cross entropy loss)')
+plt.show()
+
+plt.plot(iteri, lossi)
+plt.xlabel('iteration')
+plt.ylabel('cross entropy loss')
 plt.show()
 
 # evaluate the model on train and validation sets
@@ -139,7 +153,7 @@ for _ in range(num_of_generation):
         h1_out = torch.tanh(emb.view(-1, gram * word_vec_dim) @ W1 + b1)
         h2_out = h1_out @ W2 + b2
         probs = F.softmax(h2_out, dim=1)
-        i = torch.multinomial(probs, num_samples=1).item()
+        i = torch.multinomial(probs, num_samples=1, generator=g).item()
         context = context[1:] + [i]
         if i == 0:
             break

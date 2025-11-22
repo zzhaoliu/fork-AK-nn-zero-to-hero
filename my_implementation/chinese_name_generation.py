@@ -3,6 +3,8 @@ import torch
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 
+# implementation of makemore part2 Multi-layer perceptron on a new dataset
+
 # build the chinese character vocabulary dictionary
 # lst = open('./Ancient_Names_Corpus（25W）.txt', 'r').read().splitlines()[4:] # The dataset is from https://github.com/wainshine/Chinese-Names-Corpus/blob/master/Chinese_Names_Corpus/Ancient_Names_Corpus%EF%BC%8825W%EF%BC%89.txt
 lst = open('./Chinese_Names_Corpus（120W）.txt', 'r').read().splitlines()[4:] # The dataset is from https://github.com/wainshine/Chinese-Names-Corpus/blob/master/Chinese_Names_Corpus/Chinese_Names_Corpus%EF%BC%88120W%EF%BC%89.txt
@@ -13,6 +15,8 @@ w2i = {s:i for i, s in enumerate(words)}
 i2w = {i:s for s,i in w2i.items()}
 
 # build the dataset (a 3 gram dataset)
+    # Note: No. gram can be tuned, it's a hyperparameter on the model side, 
+    # more gram -> more char considered for each inference == increase context window
 gram = 6
 X = []; Y = []
 for s in lst:
@@ -84,7 +88,10 @@ for _ in range(train_iterations):
         
     # track stats
     iteri.append(_)
-    lossi.append(loss.item()) # log10 makes the visualisation of loss change more linear, more intuitive to inspect
+    lossi.append(loss.item()) # In Andrej's implementation, log10 transformation is directly applied here, 
+                              # however, since this might be confusing, I move this to the loss curve visualisation part, 
+                              # as a arbitrary choice to choose between original scale or log10 scale, 
+                              # and change the name description of the variable respectively to refleted the scale transformation
 
     # show the progress every 10% of the training iterations
     if _ == 0 or (_+1) % (train_iterations/10) == 0:
@@ -101,6 +108,8 @@ plt.plot(iteri, lossi)
 plt.xlabel('iteration')
 plt.ylabel('cross entropy loss')
 plt.show()
+# remember to close the plot window after inspecting the loss, 
+# otherwise the process will pause and the code below will not be executed
 
 # evaluate the model on train and validation sets
 total_loss = 0
@@ -162,6 +171,5 @@ for _ in range(num_of_generation):
     print(f'{_}th: {name}')
 
 # I feel like the part of video on the diagnosis of the performance bottleneck is a gem,
-# the thought process of diagnosing the performance bottleneck is very valuable,
-# for making decisions in practical development that improves the performance efficiently,
-# maybe I should watch that part again and think about it more deeply.
+# the thought process is very valuable for making decisions in practice for improving model performance effectively,
+# maybe I should rewatch that part and think about it more deeply.
